@@ -1,0 +1,447 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Task Service API",
+    "version": "1.0.0",
+    "description": "CRUD API for tasks with recurrence support built with clean architecture."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tasks",
+      "description": "Operations with tasks"
+    },
+    {
+      "name": "Recurrence",
+      "description": "Operations with task recurrence settings"
+    }
+  ],
+  "paths": {
+    "/api/v1/tasks": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "List tasks",
+        "responses": {
+          "200": {
+            "description": "Task list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Task" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "Create task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created task",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/api/v1/tasks/{id}": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Get task by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Tasks"],
+        "summary": "Update task",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated task",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Task" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Tasks"],
+        "summary": "Delete task",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/tasks/{id}/recurrences": {
+      "post": {
+        "tags": ["Recurrence"],
+        "summary": "Link existing task to recurrence settings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRecurrenceFromTaskRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recurrence settings created and linked",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurrenceSetting" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/api/v1/recurrences": {
+      "post": {
+        "tags": ["Recurrence"],
+        "summary": "Create new recurrence with task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRecurrenceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recurrence and task created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurrenceSetting" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      },
+      "get": {
+        "tags": ["Recurrence"],
+        "summary": "List all recurrence settings",
+        "responses": {
+          "200": {
+            "description": "List of recurrence settings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/RecurrenceSetting" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/recurrences/{id}": {
+      "get": {
+        "tags": ["Recurrence"],
+        "summary": "Get recurrence settings by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recurrence settings",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurrenceSetting" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Recurrence"],
+        "summary": "Update recurrence settings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRecurrenceRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated recurrence settings",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurrenceSetting" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "delete": {
+        "tags": ["Recurrence"],
+        "summary": "Delete recurrence settings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "BadRequest": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "CreateTaskRequest": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Prepare release"
+          },
+          "description": {
+            "type": "string",
+            "example": "Collect release notes and check migrations"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "in_progress", "done"],
+            "example": "new"
+          }
+        }
+      },
+      "UpdateTaskRequest": {
+        "type": "object",
+        "required": ["title", "status"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Prepare release"
+          },
+          "description": {
+            "type": "string",
+            "example": "Collect release notes and check migrations"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "in_progress", "done"],
+            "example": "in_progress"
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 1 },
+          "title": { "type": "string", "example": "Prepare release" },
+          "description": {
+            "type": "string",
+            "example": "Collect release notes and check migrations"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "in_progress", "done"],
+            "example": "new"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-24T00:00:00Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-03-24T00:00:00Z"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string", "example": "task not found" }
+        }
+      },
+      "CreateRecurrenceRequest": {
+        "type": "object",
+        "required": ["task", "recurrence"],
+        "properties": {
+          "task": { "$ref": "#/components/schemas/CreateTaskRequest" },
+          "recurrence": { "$ref": "#/components/schemas/RecurrenceSettingInput" }
+        }
+      },
+      "CreateRecurrenceFromTaskRequest": {
+        "type": "object",
+        "required": ["recurrence"],
+        "properties": {
+          "recurrence": { "$ref": "#/components/schemas/RecurrenceSettingInput" }
+        }
+      },
+      "UpdateRecurrenceRequest": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "enum": ["daily", "monthly", "specific", "even_odd"], "example": "daily" },
+          "interval_days": { "type": "integer", "minimum": 1, "example": 7 },
+          "interval_months": { "type": "integer", "minimum": 1, "maximum": 30, "example": 1 },
+          "specific_day": {
+            "type": "array",
+            "items": { "type": "string", "format": "date-time" },
+            "example": ["2026-04-01T00:00:00Z", "2026-04-15T00:00:00Z"]
+          },
+          "even_odd_days": { "type": "boolean", "example": true },
+          "start_date": { "type": "string", "format": "date-time", "example": "2026-04-01T00:00:00Z" },
+          "end_date": { "type": "string", "format": "date-time", "example": "2026-12-31T00:00:00Z" }
+        }
+      },
+      "RecurrenceSettingInput": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "type": "string", "enum": ["daily", "monthly", "specific", "even_odd"], "example": "daily" },
+          "interval_days": { "type": "integer", "minimum": 1, "example": 7 },
+          "interval_months": { "type": "integer", "minimum": 1, "maximum": 30, "example": 1 },
+          "specific_day": {
+            "type": "array",
+            "items": { "type": "string", "format": "date-time" },
+            "example": ["2026-04-01T00:00:00Z", "2026-04-15T00:00:00Z"]
+          },
+          "even_odd_days": { "type": "boolean", "example": true },
+          "start_date": { "type": "string", "format": "date-time", "example": "2026-04-01T00:00:00Z" },
+          "end_date": { "type": "string", "format": "date-time", "example": "2026-12-31T00:00:00Z" }
+        }
+      },
+      "RecurrenceSetting": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64", "example": 1 },
+          "type": { "type": "string", "enum": ["daily", "monthly", "specific", "even_odd"], "example": "daily" },
+          "interval_days": { "type": "integer", "minimum": 1, "example": 7 },
+          "interval_months": { "type": "integer", "minimum": 1, "maximum": 30, "example": 1 },
+          "specific_day": {
+            "type": "array",
+            "items": { "type": "string", "format": "date-time" },
+            "example": ["2026-04-01T00:00:00Z", "2026-04-15T00:00:00Z"]
+          },
+          "even_odd_days": { "type": "boolean", "example": true },
+          "start_date": { "type": "string", "format": "date-time", "example": "2026-04-01T00:00:00Z" },
+          "end_date": { "type": "string", "format": "date-time", "example": "2026-12-31T00:00:00Z" }
+        }
+      }
+    }
+  }
+}
