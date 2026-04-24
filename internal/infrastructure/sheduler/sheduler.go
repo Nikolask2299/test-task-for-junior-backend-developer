@@ -35,7 +35,7 @@ func NewSheduler(ctx context.Context, taskrepo task.Repository, recurepo recurre
 		recurepo: recurepo,
 		shedrepo: shedrepo,
 		ctx:      ctx,
-		timer:    *time.NewTicker(1 * time.Minute),
+		timer:    *time.NewTicker(1 * time.Hour),
 	}
 }
 
